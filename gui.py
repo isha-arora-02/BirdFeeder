@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import date
 
-import simulateWeatherData as dat_file
 import simulateLocationPref as loc_file
 import recommenderSystem as rec_file
+import busyBayes as bayes_file
 
 # Initialize colorama
 init()
@@ -134,10 +134,31 @@ def main():
         fig, ax = rec_obj.visualize(scaled_values)
         plt.title("Probability Distribution of Finding Fruits")
         plt.show()
+
+        print("\nNow if you would answer a few questions, we can let you know the probability of the trees you are visiting being busy, where busy means that 3+ people may be at the tree. Please answer these questions with a yes or no.")
+
+        def val_to_num(val):
+            if val == "yes":
+                return 1
+            else:
+                return 0
+
+        wind = val_to_num(input_valid_str("\nIs it windy outside?\n", ["yes", "no"]))
+        cloudy = val_to_num(input_valid_str("\nIs it cloudy outside?\n", ["yes", "no"]))
+        exams = val_to_num(input_valid_str("\nIs it finals period right now?\n", ["yes", "no"]))
+        academic_holiday = val_to_num(input_valid_str("\nIs it spring, winter, summer, or thanksgiving break?\n", ["yes", "no"]))
+
+        print("\nLoading the probability...\nThis may take a minute...\n")
+        
+        observation = {"wind":wind, "cloudy":cloudy, "exams":exams, "academic_holiday":academic_holiday} 
+        prob_busy = bayes_file.prob_busy(observation)
+        print(f"\nThank you for this information.\nThe probability that the tree is busy at {loc_to_visit} is {prob_busy}.") 
+
     except:
         print("\nOh no! There's not enough historical data that aligns with the current weather conditions :( Fruit yield predictions unfortunately cannot be made.")
 
-    print("\nThank you for using BirdFeeder! Enjoy picking fruits :)")
+
+    print("\nThank you for using BirdFeeder! Enjoy picking fruits :)\n\n")
 
 if __name__ == "__main__":
     main()
