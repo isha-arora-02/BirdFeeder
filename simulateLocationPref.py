@@ -80,8 +80,11 @@ class LocationPref:
         
         contour = ax.contourf(self.X, self.Y, user_preference_distribution, 
                              cmap='Blues', levels=50, alpha=0.7)
-        fig.colorbar(contour, ax=ax, label='Preference Intensity')
-        
+        fig.colorbar(contour, ax=ax, label='Probability Density')
+
+        for label, (x, y) in self.dict.items():
+            ax.text(x, y, label, fontsize=10, ha='center', va='center', color='black', fontweight='bold')
+    
         ax.set_xlabel('X Coordinate')
         ax.set_ylabel('Y Coordinate')
         
