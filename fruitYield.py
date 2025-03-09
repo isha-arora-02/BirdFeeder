@@ -39,7 +39,7 @@ def fruitYield(data, latestWeather):
         rain = averageRain(data, year)
         temp = averageTemp(data, year)
         # print(rain, temp)
-        if abs(latestWeather[0] - rain) < 0.5:
+        if abs(latestWeather[0] - rain) < 0.8:
             if abs(latestWeather[1] - temp) < 3:
                 pomegranateCountList.append(data[year][3]["pomegranates"])
                 orangeCountList.append(data[year][2]["oranges"])
@@ -83,3 +83,4 @@ def frootstrap(data, avgRain, avgTemp, numIterations):
 
     return {"orange": bootstrapOrangeMean, "pomegranate": bootstrapPomegranateMean}
 
+# print(frootstrap(X, 1, 66, 10000))
