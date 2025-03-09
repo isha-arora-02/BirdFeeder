@@ -54,11 +54,8 @@ class RecommendTrees:
                 numfruit = today_dat[cat] * self.fruit_range_midpoints[cat]
                 today_expect += numfruit * fruit_pick_probs[cat]
             expected_val += today_expect
-
-            # print(f"today_expect, {today_expect}")
         
         expected_val = expected_val / 30
-        # print(f"expected_val, {expected_val}")
 
         return expected_val
 
@@ -77,7 +74,6 @@ class RecommendTrees:
             data = json.load(f)
         fruit_counts = fruitYield.frootstrap(data, pastmo_rain, pastmo_temp, 10000)
         expected_year = fruit_counts[fruit]
-        print(f"expected_year, {expected_year}")
         fruit_season = self.seasons[fruit] 
 
         return expected_year/len(fruit_season)
@@ -110,13 +106,9 @@ class RecommendTrees:
         all_expected = np.zeros((campus_boundary[1], campus_boundary[3]))
 
         for loc, coords in stanford_map_locs.items():
-            print(loc)
             expected_picked = self.simulate_expected_fruit_picked(fruit)
-            print(f"expected picked {expected_picked}")
             expected_yield = self.expected_fruit_on_tree_month(fruit, pastmo_rain, pastmo_temp)
-            print(f"expected yield {expected_yield}")
             loc_fruit = self.expected_fruit_in_loc(expected_picked, expected_yield, loc, fruit)
-            print(f"loc_fruit: {loc_fruit}")
             all_expected[coords[0][0], coords[1][0]] = loc_fruit
         
         return all_expected
@@ -138,11 +130,7 @@ class RecommendTrees:
             Average temperature in inches over the past year 
         """
         all_locs_values = self.calculate_fruit_in_all_locs(campus_boundary, stanford_map_locs, fruit, pastmo_rain, pastmo_temp)
-        print(all_locs_values)
-        print(self.pref_probs)
         scaled_values = np.array(all_locs_values) * np.array(self.pref_probs)
-        print(scaled_values)
-        # print(np.unravel_index(np.argmax(scaled_values, axis=None), scaled_values.shape))
         max_loc_ind = list(np.unravel_index(np.argmax(scaled_values, axis=None), scaled_values.shape))
         max_loc = stanford_coord_locs[tuple(max_loc_ind)]
         print(f"There are {self.tree_counts[max_loc][fruit]} {fruit} trees that you can pick fruits from in {max_loc}!")
