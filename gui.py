@@ -47,7 +47,7 @@ STANFORD_MAP_DICT = {"ev": [0.5, 1.5], "gsb": [0.5, 0.5], "memchu": [1.5, 0.5], 
 STANFORD_MAP_LOCS = {"ev": [(0, 1), (1, 2)], "gsb": [(0, 1), (0, 1)], "memchu": [(1, 2), (0, 1)], "tressider": [(1, 2), (1, 2)], "med": [(2, 3), (0, 1)], "engg": [(2, 3), (1, 2)]}
 STANFORD_COORD_LOCS = {(0, 1): "ev", (0, 0): "gsb", (1, 0): "memchu", (1, 1): "tressider", (2, 0): "med", (2, 1): "engg"}
 TREE_COUNTS =  {"ev": {"orange": 1, "pomegranate": 1}, "gsb": {"orange": 0, "pomegranate": 0}, "memchu": {"orange": 2, "pomegranate": 0}, "tressider": {"orange": 0, "pomegranate": 0}, "med": {"orange": 1, "pomegranate": 0}, "engg": {"orange": 0, "pomegranate": 1}}
-SEASONS = {"orange": ["december", "january", "february"], "pomegranates": ["october", "november", "december"]}
+SEASONS = {"orange": ["december", "january", "february"], "pomegranate": ["october", "november", "december"]}
 
 
 
@@ -114,16 +114,30 @@ def main():
         monthlst = ", ".join(SEASONS[fruit])
         month = input_valid_lst(f"Which of the following months would you like to view these probabilities for? - {monthlst}\n", SEASONS[fruit])
 
+    flag = input_valid_str("\nWhat is the average temperature and rainfall over the past year? If you would like to input these values yourself, type yes. Else we can use the following default values calculated for the past year: avg_temp = 60 degrees F and avg_rain = 1.51 inches. For this option, type no.\n", ["yes", "no"])
+    if flag == "no":
+        avg_temp = 60
+        avg_rain = 1.51
+    else:
+        avg_temp = float(input("\nEnter the average temperature over the past year: "))
+        avg_rain = float(input("\nEnter the average rainfall over the past year: "))
+
+
     print("\nCalculating the best location to visit...\n\n")
+    
+    try:
+        # define recommender object
+        rec_obj = rec_file.RecommendTrees(prob_locs, TREE_COUNTS, SEASONS)
+        scaled_values, loc_to_visit = rec_obj.recommend_location(CAMPUS_BOUNDS, STANFORD_MAP_LOCS, fruit, STANFORD_COORD_LOCS, avg_rain, avg_temp)
 
-    # define recommender object
-    rec_obj = rec_file.RecommendTrees(prob_locs, TREE_COUNTS, SEASONS)
-    scaled_values, loc_to_visit = rec_obj.recommend_location(CAMPUS_BOUNDS, STANFORD_MAP_LOCS, fruit, STANFORD_COORD_LOCS)
+        print("\nNow let's see what the probability distributions were for finding fruit for each location!")
+        fig, ax = rec_obj.visualize(scaled_values)
+        plt.title("Probability Distribution of Finding Fruits")
+        plt.show()
+    except:
+        print("\nOh no! There's not enough historical data that aligns with the current weather conditions :( Fruit yield predictions unfortunately cannot be made.")
 
-    print("Now let's see what the probability distributions were for finding fruit for each location!")
-    fig, ax = rec_obj.visualize(scaled_values)
-    plt.title("Probability Distribution of Finding Fruits")
-    plt.show()
+    print("\nThank you for using BirdFeeder! Enjoy picking fruits :)")
 
 if __name__ == "__main__":
     main()
