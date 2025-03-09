@@ -15,7 +15,7 @@ import json
 # Load from a file
 with open('weatherData.json', 'r') as f:
     X = json.load(f)
-print(X)
+# print(X)
 
 def averageRain(data, year):
     averageRain = 0
@@ -43,7 +43,7 @@ def fruitYield(data, latestWeather):
             if abs(latestWeather[1] - temp) < 3:
                 pomegranateCountList.append(data[year][3]["pomegranates"])
                 orangeCountList.append(data[year][2]["oranges"])
-                print(year)
+                # print(year)
     # if len(pomegranateCountList) > 0:
     #     print(np.mean(pomegranateCountList), pomegranateCountList)
     return (pomegranateCountList, orangeCountList)
@@ -73,12 +73,13 @@ def frootstrap(data, avgRain, avgTemp, numIterations):
         # print(sample)
         sampleSum = np.sum(sample)
         bootstrapOrangeMean += (sampleSum / (numIterations * len(orangeCounts)))
-    print(bootstrapOrangeMean)
+    # print(bootstrapOrangeMean)
     bootstrapPomegranateMean = 0
     for i in range(numIterations):
         sample = np.random.choice(pomegranateCounts, len(pomegranateCounts), replace=True)
         sampleSum = np.sum(sample)
         bootstrapPomegranateMean += (sampleSum / (numIterations * len(pomegranateCounts)))
-    print(bootstrapPomegranateMean)
+    # print(bootstrapPomegranateMean)
 
-frootstrap(X, 2, 67, 100000)
+    return {"orange": bootstrapOrangeMean, "pomegranate": bootstrapPomegranateMean}
+
