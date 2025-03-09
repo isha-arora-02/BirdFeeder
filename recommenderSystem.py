@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import scipy.stats as stats
+import json
+
+import fruitYield 
 
 class RecommendTrees:
     def __init__(self, pref_probs, tree_counts, seasons):
@@ -59,14 +62,21 @@ class RecommendTrees:
 
         return expected_val
 
-    def expected_fruit_on_tree_month(self, fruit):
+    def expected_fruit_on_tree_month(self, fruit, pastmo_rain, pastmo_temp):
         """
         Get the expected number of fruit on a single fruit tree in a month (assumption made here is that a month is a 30-day period)
         fruit: string
-            Name of the fruit tree for which data is to be calculated           
+            Name of the fruit tree for which data is to be calculated  
+        pastmo_rain: float
+            Average rainfall in inches over the past year
+        pastmo_temp: float  
+            Average temperature in inches over the past year 
         """
-        # TODO: get expected yield of fruit on a tree for the year
-        # expected_year = bayes_net[fruit].value
+
+        with open("weatherData.json", "r") as f:
+            data = json.load(f)
+        fruit_counts = fruitYield.frootstrap(data, pastmo_rain, pastmo_temp, 10000)
+        expected_year = fruit_counts[fruit]
         expected_year =  200
         fruit_season = self.seasons[fruit] 
 
@@ -83,7 +93,7 @@ class RecommendTrees:
         num_trees = self.tree_counts[location][fruit]
         return (expected_yield - expected_picked) * num_trees
     
-    def calculate_fruit_in_all_locs(self, campus_boundary, stanford_map_locs, fruit):
+    def calculate_fruit_in_all_locs(self, campus_boundary, stanford_map_locs, fruit, pastmo_rain, pastmo_temp):
         """
         Return the expected number of a fruit in each location in a month (assumption made here is that a month is a 30-day period)
         campus_boundary: tuple
@@ -91,7 +101,11 @@ class RecommendTrees:
         stanford_map_locs: dict
             {location: [(x1, x2), (y1, y2)]} defining the coordinates of the boundary for each location
         fruit: string
-            Name of the fruit tree for which data is to be calculated      
+            Name of the fruit tree for which data is to be calculated   
+        pastmo_rain: float
+            Average rainfall in inches over the past year
+        pastmo_temp: float  
+            Average temperature in inches over the past year    
         """
         all_expected = np.zeros((campus_boundary[1], campus_boundary[3]))
 
@@ -99,7 +113,7 @@ class RecommendTrees:
             # print(loc)
             expected_picked = self.simulate_expected_fruit_picked(fruit)
             # print(f"expected picked {expected_picked}")
-            expected_yield = self.expected_fruit_on_tree_month(fruit)
+            expected_yield = self.expected_fruit_on_tree_month(fruit, pastmo_rain, pastmo_temp)
             # print(f"expected yield {expected_yield}")
             loc_fruit = self.expected_fruit_in_loc(expected_picked, expected_yield, loc, fruit)
             # print(f"loc_fruit: {loc_fruit}")
@@ -107,7 +121,7 @@ class RecommendTrees:
         
         return all_expected
 
-    def recommend_location(self, campus_boundary, stanford_map_locs, fruit, stanford_coord_locs):
+    def recommend_location(self, campus_boundary, stanford_map_locs, fruit, stanford_coord_locs, pastmo_rain, pastmo_temp):
         """
         Return the location with the largest probability of finding fruit
         campus_boundary: tuple
@@ -118,8 +132,12 @@ class RecommendTrees:
             Name of the fruit tree for which data is to be calculated
         stanford_coord_locs:
             For each coordinate of the resultant matrix, it provides the respective location on campus
+        pastmo_rain: float
+            Average rainfall in inches over the past year
+        pastmo_temp: float  
+            Average temperature in inches over the past year 
         """
-        all_locs_values = self.calculate_fruit_in_all_locs(campus_boundary, stanford_map_locs, fruit)
+        all_locs_values = self.calculate_fruit_in_all_locs(campus_boundary, stanford_map_locs, fruit, pastmo_rain, pastmo_temp)
         scaled_values = np.array(all_locs_values) * np.array(self.pref_probs)
         # print(np.unravel_index(np.argmax(scaled_values, axis=None), scaled_values.shape))
         max_loc_ind = list(np.unravel_index(np.argmax(scaled_values, axis=None), scaled_values.shape))
