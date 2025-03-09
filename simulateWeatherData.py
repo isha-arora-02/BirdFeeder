@@ -2,6 +2,7 @@ import random
 from scipy import stats
 from scipy.stats import bernoulli
 import json
+import numpy as np
 
 def generate_rainfall():
     avg_rain = [4, 4, 2.5, 1.5, 0.75, 0.5, 0.1, 0.1, 0, 1.5, 3, 5]
@@ -17,20 +18,21 @@ def generate_rainfall():
 def generate_temperature():
     """Generate monthly temperature data using a normal distribution."""
     # Average temperatures (°F) for norCal by month
-    if bernoulli.rvs(0.75):
-        avg_temps = [50, 54, 57, 60, 65, 70, 75, 76, 74, 66, 57, 51]
+    if bernoulli.rvs(0.45):
+        avg_temps = [49, 49, 49, 55, 60, 70, 70, 72, 70, 60, 54, 50]
         std_devs = [2, 3, 1, 1, 1, 2, 3, 2, 4, 3, 2, 2]
     elif bernoulli.rvs(0.5):
         avg_temps = [50, 49, 54, 55, 58, 60, 70, 71, 70, 66, 54, 54]
         std_devs = [2, 3, 1, 1, 1, 2, 3, 2, 4, 3, 2, 2]
     else:
-        avg_temps = [60, 61, 60, 62, 68, 70, 75, 74, 72, 76, 60, 59]
+        avg_temps = [60, 61, 63, 68, 70, 75, 80, 78, 75, 76, 65, 63]
         std_devs = [2, 3, 1, 1, 1, 2, 3, 2, 4, 3, 2, 2]
 
     # Pair the avg temps and st.devs above, then go thru them as pairs (the zip fn does this)
     # each temp/stdev pairing is used as params in normal to get one sample for each month of the year.
     temperatures = tuple(round(stats.norm(loc=mu, scale=sigma).rvs(), 1) for mu, sigma in zip(avg_temps, std_devs))
     #you'll get a TUPLE of TWELVE values.
+    #print(np.mean(temperatures))
     return temperatures
 
 
@@ -85,7 +87,7 @@ def simulateWeatherData():
 
 
 weatherData = simulateWeatherData()
-# print(weatherData)
+#print(weatherData)
 
 # saving weatherData into json format
 with open('weatherData.json', 'w') as f:
