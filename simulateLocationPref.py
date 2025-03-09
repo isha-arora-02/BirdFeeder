@@ -47,6 +47,7 @@ class LocationPref:
 
         # get weights for each gaussian in gmm
         pref_strengths = [1.0] * n_locs
+        
         total_strength = sum(pref_strengths)
         weights = [s / total_strength for s in pref_strengths]
 

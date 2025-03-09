@@ -12,7 +12,7 @@ import busyBayes as bayes_file
 
 # Initialize colorama
 init()
-a
+
 BIRDFEEDER_LOGO = [
     "  ____  _          _   _______           _           ",
     " |  _ \\(_)        | | |  _____|         | |          ",
@@ -124,7 +124,7 @@ def main():
         avg_rain = 1.51
     else:
         avg_temp = float(input("\nEnter the average temperature over the past year. Please ensure that this value is in the range of 58F to 70F: "))
-        avg_rain = float(input("\nEnter the average rainfall over the past year. Please ensure that this value is in the range of 0in to 2in: "))
+        avg_rain = float(input("\nEnter the average rainfall over the past year. Please ensure that this value is in the range of 1in to 2in: "))
 
 
     print("\nCalculating the best location to visit...\n\n")

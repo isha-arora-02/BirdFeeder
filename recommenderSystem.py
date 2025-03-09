@@ -77,7 +77,7 @@ class RecommendTrees:
             data = json.load(f)
         fruit_counts = fruitYield.frootstrap(data, pastmo_rain, pastmo_temp, 10000)
         expected_year = fruit_counts[fruit]
-        expected_year =  200
+        print(f"expected_year, {expected_year}")
         fruit_season = self.seasons[fruit] 
 
         return expected_year/len(fruit_season)
@@ -110,13 +110,13 @@ class RecommendTrees:
         all_expected = np.zeros((campus_boundary[1], campus_boundary[3]))
 
         for loc, coords in stanford_map_locs.items():
-            # print(loc)
+            print(loc)
             expected_picked = self.simulate_expected_fruit_picked(fruit)
-            # print(f"expected picked {expected_picked}")
+            print(f"expected picked {expected_picked}")
             expected_yield = self.expected_fruit_on_tree_month(fruit, pastmo_rain, pastmo_temp)
-            # print(f"expected yield {expected_yield}")
+            print(f"expected yield {expected_yield}")
             loc_fruit = self.expected_fruit_in_loc(expected_picked, expected_yield, loc, fruit)
-            # print(f"loc_fruit: {loc_fruit}")
+            print(f"loc_fruit: {loc_fruit}")
             all_expected[coords[0][0], coords[1][0]] = loc_fruit
         
         return all_expected
@@ -138,7 +138,10 @@ class RecommendTrees:
             Average temperature in inches over the past year 
         """
         all_locs_values = self.calculate_fruit_in_all_locs(campus_boundary, stanford_map_locs, fruit, pastmo_rain, pastmo_temp)
+        print(all_locs_values)
+        print(self.pref_probs)
         scaled_values = np.array(all_locs_values) * np.array(self.pref_probs)
+        print(scaled_values)
         # print(np.unravel_index(np.argmax(scaled_values, axis=None), scaled_values.shape))
         max_loc_ind = list(np.unravel_index(np.argmax(scaled_values, axis=None), scaled_values.shape))
         max_loc = stanford_coord_locs[tuple(max_loc_ind)]
@@ -164,10 +167,33 @@ class RecommendTrees:
 
 
 # if __name__ == "__main__":
+#     import simulateLocationPref as locpreffile
+    
+#     campus_bounds = (0, 3, 0, 2)  
+#     stanford_map_dict = {"ev": [0.5, 1.5], "gsb": [0.5, 0.5], "memchu": [1.5, 0.5], "tressider": [1.5, 1.5], "med": [2.5, 0.5], "engg": [2.5, 1.5]}
+#     stanford_map_locs = {"ev": [(0, 1), (1, 2)], "gsb": [(0, 1), (0, 1)], "memchu": [(1, 2), (0, 1)], "tressider": [(1, 2), (1, 2)], "med": [(2, 3), (0, 1)], "engg": [(2, 3), (1, 2)]}
+#     stanford_coord_locs = {(0, 1): "ev", (0, 0): "gsb", (1, 0): "memchu", (1, 1): "tressider", (2, 0): "med", (2, 1): "engg"}
 
-#     pref_probs = []
+
+#     pref_locs = ["med"]
+
+#     pref_obj = locpreffile.LocationPref(campus_bounds, stanford_map_dict, stanford_map_locs)
+#     pdf = pref_obj.create_pref_pdf(pref_locs)
+
+#     fig, ax = pref_obj.visualize(pdf)
+#     plt.show()
+
+#     prob_locs = pref_obj.probability_locs(pdf)
+#     print(sum(sum(prob_locs)))
+#     print(prob_locs)
+
+#     pref_probs = prob_locs
 #     tree_counts = {"ev": {"orange": 1, "pomegranate": 1}, "gsb": {"orange": 0, "pomegranate": 0}, "memchu": {"orange": 2, "pomegranate": 0}, "tressider": {"orange": 0, "pomegranate": 0}, "med": {"orange": 1, "pomegranate": 0}, "engg": {"orange": 0, "pomegranate": 1}}
 #     stanford_map_locs = {"ev": [(0, 1), (1, 2)], "gsb": [(0, 1), (0, 1)], "memchu": [(1, 2), (0, 1)], "tressider": [(1, 2), (1, 2)], "med": [(2, 3), (0, 1)], "engg": [(2, 3), (1, 2)]}
 #     campus_boundary=(0, 3, 0, 2) 
-#     obj = RecommendTrees(pref_probs=pref_probs, tree_counts=tree_counts)
-#     print(obj.calculate_fruit_in_all_locs(campus_boundary, stanford_map_locs, "orange"))
+#     seasons = {"orange": ["december", "january", "february"], "pomegranate": ["october", "november", "december"]}
+
+#     obj = RecommendTrees(pref_probs=pref_probs, tree_counts=tree_counts, seasons=seasons)
+#     all_expected = obj.calculate_fruit_in_all_locs(campus_boundary, stanford_map_locs, "orange", 1, 69.5)
+#     scaled, loc = obj.recommend_location(campus_boundary, stanford_map_locs, "orange", stanford_coord_locs, 1, 69.5)
+#     print(scaled, loc)
