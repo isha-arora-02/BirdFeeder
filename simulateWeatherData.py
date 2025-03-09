@@ -5,13 +5,16 @@ import json
 import numpy as np
 
 def generate_rainfall():
-    avg_rain = [4, 4, 2.5, 1.5, 0.75, 0.5, 0.1, 0.1, 0, 1.5, 3, 5]
-    std_devs = [1, 1, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5, 1, 0.8, 1.2]
-
-
+    if bernoulli.rvs(0.5):
+        avg_rain = [4, 4, 2.5, 1.5, 0.75, 0.5, 0.1, 0.1, 0, 1.5, 3, 5]
+        std_devs = [1, 1, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5, 1, 0.8, 1.2]
+    else:
+        avg_rain = [1, 1, 1, 1, 0.75, 0.5, 0.1, 0.1, 0, 1.5, 1, 1]
+        std_devs = [1, 1, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5, 1, 0.8, 1.2]
     # Pair the avg temps and st.devs above, then go thru them as pairs (the zip fn does this)
     # each temp/stdev pairing is used as params in normal to get one sample for each month of the year.
     rainfall = tuple(abs(round(stats.norm(loc=mu, scale=sigma).rvs(), 1)) for mu, sigma in zip(avg_rain, std_devs))
+    print(np.mean(rainfall))
     return rainfall
 
 
