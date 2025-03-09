@@ -83,4 +83,4 @@ def frootstrap(data, avgRain, avgTemp, numIterations):
 
     return {"orange": bootstrapOrangeMean, "pomegranate": bootstrapPomegranateMean}
 
-# print(frootstrap(X, 1, 66, 10000))
+ # print(frootstrap(X, 1, 66, 10000))
