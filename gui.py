@@ -103,6 +103,10 @@ def main():
     pref_pdf = pref_obj.create_pref_pdf(pref_locs_lst)
     prob_locs = pref_obj.probability_locs(pref_pdf)
 
+    print("\nBased on these location preferences, here is the contour map representing the distribution of the probability densities that you would visit a certain location on campus!\n")
+    fig1, ax1 = pref_obj.visualize(pref_pdf)
+    plt.show()
+
     fruit = input_valid_lst("\nNow, please tell us what fruit you would like to pick of the following: orange, pomegranate\n", ["orange", "pomegranate"])
     fruit = fruit.strip().lower()
 
@@ -119,8 +123,8 @@ def main():
         avg_temp = 60
         avg_rain = 1.51
     else:
-        avg_temp = float(input("\nEnter the average temperature over the past year: "))
-        avg_rain = float(input("\nEnter the average rainfall over the past year: "))
+        avg_temp = float(input("\nEnter the average temperature over the past year. Please ensure that this value is in the range of 58F to 70F: "))
+        avg_rain = float(input("\nEnter the average rainfall over the past year. Please ensure that this value is in the range of 0in to 2in: "))
 
 
     print("\nCalculating the best location to visit...\n\n")
