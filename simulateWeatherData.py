@@ -1,40 +1,39 @@
 
 ##############################################################################
-                         # to-do
-                         # the temp scale in fruit fn is still hard to understand.
-                         # app logo
+ # to-do
+     # the temp scale in fruit fn is still hard to understand.
+
+     # app logo
 ##############################################################################
 
 import random
 from scipy import stats
 from scipy.stats import bernoulli
+import json
+
+def generate_rainfall(lmbda=1.5):
+    avg_rain = [4, 4, 2.5, 1.5, 0.75, 0.5, 0.1, 0.1, 0, 1.5, 3, 5]
+    std_devs = [1, 1, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5, 1, 0.8, 1.2]
 
 
-def generate_rainfall(lmbda=2):
-    # default lambda is 2 to represent the "typical" time until a "success", meaning
-    # rainfall. The bernoullis create outlier lambdas to add more heterogeneity to the
-    # numbers this fn returns.
-    if bernoulli.rvs(0.15):
-        if bernoulli.rvs(0.5): #choose an extremely high or low val for lambda.
-            lmbda = random.choice([6])
-        else:
-            lmbda = random.choice([0.1])
-    B = stats.expon(scale=lmbda)
-    return tuple(round(B.rvs(), 2) for _ in range(12))
-
-# def generate_temperature():
-#     """Generate monthly temperature data using a uniform distribution."""
-#     return tuple(round(random.uniform(30, 80), 1) for _ in range(12))
-#
+    # Pair the avg temps and st.devs above, then go thru them as pairs (the zip fn does this)
+    # each temp/stdev pairing is used as params in normal to get one sample for each month of the year.
+    rainfall = tuple(abs(round(stats.norm(loc=mu, scale=sigma).rvs(), 1)) for mu, sigma in zip(avg_rain, std_devs))
+    return rainfall
 
 
 def generate_temperature():
     """Generate monthly temperature data using a normal distribution."""
     # Average temperatures (°F) for Northern California by month
-    avg_temps = [50, 54, 57, 60, 65, 70, 75, 76, 74, 66, 57, 51]
-
-    # different stdevs for each month
-    std_devs = [5, 5, 6, 6, 7, 7, 8, 8, 7, 6, 5, 5]
+    if bernoulli.rvs(0.75):
+        avg_temps = [50, 54, 57, 60, 65, 70, 75, 76, 74, 66, 57, 51]
+        std_devs = [2, 3, 1, 1, 1, 2, 3, 2, 4, 3, 2, 2]
+    elif bernoulli.rvs(0.5):
+        avg_temps = [50, 49, 54, 55, 58, 60, 70, 71, 70, 66, 54, 54]
+        std_devs = [2, 3, 1, 1, 1, 2, 3, 2, 4, 3, 2, 2]
+    else:
+        avg_temps = [60, 61, 60, 62, 68, 70, 75, 74, 72, 76, 60, 59]
+        std_devs = [2, 3, 1, 1, 1, 2, 3, 2, 4, 3, 2, 2]
 
     # Pair the avg temps and st.devs above, then go thru them as pairs (the zip fn does this)
     # each temp/stdev pairing is used as params in normal to get one sample for each month of the year.
@@ -46,29 +45,23 @@ def generate_temperature():
 
 def calculate_fruit_yield(rainfall, temperature, fruitType):
     """Calculate fruit yield based on rainfall and temperature conditions."""
-    avg_rainfall = sum(rainfall) / len(rainfall)
-    avg_temperature = sum(temperature) / len(temperature)
+
     if fruitType == "orange":
-        # Normalize values to a scale (assuming max rainfall ~12 inches per month)
-        rainfall_factor = avg_rainfall * 50  # 50-point contribution from rainfall
-        # Temperature effect: ideal range ~50-70°F, penalizing extreme values
-        # temp_factor first gets distance from 60, the 'ideal temp'.
-        # if it's exactly 60, you have a value of 0 which will stay 0 when divided by 60
-        # subtracting this from 1 yeilds 1, so it has max contribution.
-        # the opposite of this is true if temp is 0.
-        temp_factor = max(0, (1 - abs(avg_temperature - 60) / 30)) * 50
-        fruitMean = round(rainfall_factor + temp_factor)
-        if fruitMean > 280:
-            fruitMean = 280
+        for month in range(12):
+            fruitYield = 180 + (10 * temperature[month]) + (5 * rainfall[month]) - (0.2 * (temperature[month] ** 2)) - (0.05 * (rainfall[month] ** 2)) + (0.5 * temperature[month] * rainfall[month])
+            if fruitYield < 0:
+                fruitYield = 0
+
     if fruitType == "pomegranate":
-        rainfall_factor = avg_rainfall * 5
-        temp_factor = max(0, (1 - abs(avg_temperature - 60) / 60)) * 5
-        fruitMean = round(rainfall_factor + temp_factor)
-        if fruitMean > 15:
-            fruitMean = 15
-    fruitVariance = fruitMean * 0.1
-    fruitGaussian = stats.norm(fruitMean, fruitVariance)
-    fruitYield = fruitGaussian.rvs()
+        for month in range(12):
+            fruitYield = 10 + (7 * temperature[month]) + (3 * rainfall[month]) - (0.15 * (temperature[month] ** 2)) - (0.07 * (rainfall[month] ** 2)) + (0.3 * temperature[month] * rainfall[month])
+            if fruitYield < 0:
+                fruitYield = 0
+        # if fruitMean > 15:
+        #     fruitMean = 15
+    # fruitVariance = fruitMean * 0.1
+    # fruitGaussian = stats.norm(fruitMean, fruitVariance)
+
     return round(fruitYield)
 
 
@@ -83,10 +76,9 @@ def simulateWeatherData():
     - "pomegranates" <- average pomegranate production across Stanford bushes for the year
     """
     weather_data = {}
-    for year in range(2010, 2026):
+    for year in range(1995, 2026):
         rainfall = generate_rainfall()
         temperature = generate_temperature()
-    # fruit yeild will be based off avg PAST NINE MO.
         orange_yield = calculate_fruit_yield(rainfall, temperature, "orange")
         pomegranate_yield = calculate_fruit_yield(rainfall, temperature, "pomegranate")
 
@@ -98,4 +90,12 @@ def simulateWeatherData():
             {"pomegranates": pomegranate_yield}
         ]
     return weather_data
-simulateWeatherData()
+
+
+weatherData = simulateWeatherData()
+# print(weatherData)
+
+# saving weatherData into json format
+with open('weatherData.json', 'w') as f:
+    json.dump(weatherData, f)
+

@@ -3,16 +3,20 @@
 
 # THE OUTPUT HERE SHOULD BE AN EXPECTATION!!!
 
-from simulateWeatherData import simulateWeatherData
 import numpy as np
 import random
+import json
 
 # outline:
     # make bins for temp and rainfall
     # define which bin this year falls into
     # boostrap an expectation from that sample
 
-X = simulateWeatherData()
+# Load from a file
+with open('weatherData.json', 'r') as f:
+    X = json.load(f)
+print(X)
+
 def averageRain(data, year):
     averageRain = 0
     for value in data[year][0]:
@@ -35,10 +39,11 @@ def fruitYield(data, latestWeather):
         rain = averageRain(data, year)
         temp = averageTemp(data, year)
         # print(rain, temp)
-        if abs(latestWeather[0] - rain) < 2:
-            if abs(latestWeather[1] - temp) < 2:
+        if abs(latestWeather[0] - rain) < 0.5:
+            if abs(latestWeather[1] - temp) < 3:
                 pomegranateCountList.append(data[year][3]["pomegranates"])
                 orangeCountList.append(data[year][2]["oranges"])
+                print(year)
     # if len(pomegranateCountList) > 0:
     #     print(np.mean(pomegranateCountList), pomegranateCountList)
     return (pomegranateCountList, orangeCountList)
@@ -51,27 +56,29 @@ def fruitYield(data, latestWeather):
 # tree2 = fruitYeild
 #do it for a few trees and make an "orange sample" for the area. Then use this to bootstrap.
 
-def bootstrapFruitPrediction(data, avgRain, avgTemp, numIterations):
+def frootstrap(data, avgRain, avgTemp, numIterations):
     # model five orange trees and five pomegranate bushes
+    # averageRain and averageTemp are numbers you observe from this year.
     orangeCounts = []
     pomegranateCounts = []
-    for i in range(5):
-        orangeList = fruitYield(data, (avgRain, avgTemp))[1]
-        pomegranateList = fruitYield(data, (avgRain, avgTemp))[0]
-        orangeCounts.extend(orangeList)
-        pomegranateCounts.extend((pomegranateList))
+
+    orangeList = fruitYield(data, (avgRain, avgTemp))[1]
+    pomegranateList = fruitYield(data, (avgRain, avgTemp))[0]
+    orangeCounts.extend(orangeList)
+    pomegranateCounts.extend((pomegranateList))
         # apparently random.choices() automatically samples WITH replacement.
     bootstrapOrangeMean = 0
     for i in range(numIterations):
-        sample = random.choices(orangeCounts, k=len(orangeCounts))
+        sample = np.random.choice(orangeCounts, len(orangeCounts), replace=True)
+        # print(sample)
         sampleSum = np.sum(sample)
         bootstrapOrangeMean += (sampleSum / (numIterations * len(orangeCounts)))
     print(bootstrapOrangeMean)
     bootstrapPomegranateMean = 0
     for i in range(numIterations):
-        sample = random.choices(pomegranateCounts, k=len(pomegranateCounts))
+        sample = np.random.choice(pomegranateCounts, len(pomegranateCounts), replace=True)
         sampleSum = np.sum(sample)
         bootstrapPomegranateMean += (sampleSum / (numIterations * len(pomegranateCounts)))
     print(bootstrapPomegranateMean)
 
-bootstrapFruitPrediction(X, 2, 67, 10000)
+frootstrap(X, 2, 67, 100000)
