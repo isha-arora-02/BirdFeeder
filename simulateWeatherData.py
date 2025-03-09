@@ -1,17 +1,9 @@
-
-##############################################################################
- # to-do
-     # the temp scale in fruit fn is still hard to understand.
-
-     # app logo
-##############################################################################
-
 import random
 from scipy import stats
 from scipy.stats import bernoulli
 import json
 
-def generate_rainfall(lmbda=1.5):
+def generate_rainfall():
     avg_rain = [4, 4, 2.5, 1.5, 0.75, 0.5, 0.1, 0.1, 0, 1.5, 3, 5]
     std_devs = [1, 1, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5, 1, 0.8, 1.2]
 
@@ -24,7 +16,7 @@ def generate_rainfall(lmbda=1.5):
 
 def generate_temperature():
     """Generate monthly temperature data using a normal distribution."""
-    # Average temperatures (°F) for Northern California by month
+    # Average temperatures (°F) for norCal by month
     if bernoulli.rvs(0.75):
         avg_temps = [50, 54, 57, 60, 65, 70, 75, 76, 74, 66, 57, 51]
         std_devs = [2, 3, 1, 1, 1, 2, 3, 2, 4, 3, 2, 2]

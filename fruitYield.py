@@ -1,18 +1,7 @@
-# for oranges, season is december-Feb, so start 9mo in April
-# for pomegranates, season is october-december so start 9mo in February.
-
-# THE OUTPUT HERE SHOULD BE AN EXPECTATION!!!
-
 import numpy as np
 import random
 import json
 
-# outline:
-    # make bins for temp and rainfall
-    # define which bin this year falls into
-    # boostrap an expectation from that sample
-
-# Load from a file
 with open('weatherData.json', 'r') as f:
     X = json.load(f)
 # print(X)
@@ -47,17 +36,8 @@ def fruitYield(data, latestWeather):
     # if len(pomegranateCountList) > 0:
     #     print(np.mean(pomegranateCountList), pomegranateCountList)
     return (pomegranateCountList, orangeCountList)
-    #bootstrap fruitList for an estimated population mean
-        #if rain and temp avg are within x distance from this past year's values, append the fruit count to list
-        #make it fruit-specific; do u want to look at orange or pom?
-
-# print(fruitYield(X, (2, 67)))
-# tree1 = fruitYeild
-# tree2 = fruitYeild
-#do it for a few trees and make an "orange sample" for the area. Then use this to bootstrap.
 
 def frootstrap(data, avgRain, avgTemp, numIterations):
-    # model five orange trees and five pomegranate bushes
     # averageRain and averageTemp are numbers you observe from this year.
     orangeCounts = []
     pomegranateCounts = []
@@ -83,4 +63,4 @@ def frootstrap(data, avgRain, avgTemp, numIterations):
 
     return {"orange": bootstrapOrangeMean, "pomegranate": bootstrapPomegranateMean}
 
- # print(frootstrap(X, 1, 66, 10000))
+# print(frootstrap(X, 1.1, 56.8, 10000))
