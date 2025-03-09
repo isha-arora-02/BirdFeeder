@@ -78,7 +78,6 @@ class LocationPref:
         """
         fig, ax = plt.subplots(figsize=(8, 6))
         
-        # Plot the preference distribution
         contour = ax.contourf(self.X, self.Y, user_preference_distribution, 
                              cmap='Blues', levels=50, alpha=0.7)
         fig.colorbar(contour, ax=ax, label='Preference Intensity')
@@ -94,7 +93,13 @@ class LocationPref:
         return fig, ax
     
     def probability_locs(self, pdf):
-        loc_probs = np.zeros((3, 2))
+        """
+        Get probability of each location from the PDF.
+        Parameters:
+        pdf: numpy array
+            probability density function of the locations that the user prefers/is most likely to go to
+        """
+        loc_probs = np.zeros((self.campus_boundary[1], self.campus_boundary[3]))
         cell_area = 1
 
         for inds in (self.locs).values():
